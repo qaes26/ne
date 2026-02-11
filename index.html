@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إلى نور عيني</title>
+    <!-- استدعاء خطوط عربية جميلة وتيلويند للتصميم -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%); /* خلفية زهرية فاتحة */
+            overflow-x: hidden;
+        }
+
+        .font-amiri {
+            font-family: 'Amiri', serif;
+        }
+
+        /* تأثيرات الخلفية المتحركة (فراشات وزهور بدلاً من القلوب الحمراء) */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10-10-4.477-10-10zm-10 0c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10-10-4.477-10-10z' fill='%23ff69b4' fill-opacity='1'/%3E%3C/svg%3E");
+            animation: moveBackground 60s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            from { background-position: 0 0; }
+            to { background-position: 100% 100%; }
+        }
+
+        /* تنسيق الزر المتفجر */
+        .pulse-button {
+            box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
+            animation: pulse-pink 2s infinite;
+        }
+
+        @keyframes pulse-pink {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(236, 72, 153, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
+        }
+
+        /* الكانفاس الخاص بالانفجار */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .hidden-element {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .visible-element {
+            display: flex;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 relative">
+
+    <div class="bg-pattern"></div>
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="login-screen" class="fixed inset-0 z-40 flex flex-col items-center justify-center bg-pink-100/95 transition-all duration-700">
+        <div class="glass-card p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 text-center transform hover:scale-105 transition-transform duration-300">
+            <div class="text-6xl mb-4">👑</div>
+            <h2 class="text-2xl font-bold text-pink-600 mb-2">أهلاً بأميرة أبيها</h2>
+            <p class="mb-6 text-gray-500 text-sm font-semibold">تلميح: بنت قيس 😉</p>
+            <input type="text" id="password-input" placeholder="اكتبي اسمك هنا (بالإنجليزي)" 
+                   class="w-full px-4 py-3 rounded-xl border-2 border-pink-300 focus:border-pink-500 focus:outline-none text-center text-xl tracking-widest mb-4 placeholder-gray-400">
+            <button onclick="checkPassword()" 
+                    class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-xl transition-colors shadow-lg">
+                دخول
+            </button>
+            <p id="error-msg" class="text-red-500 mt-3 hidden text-sm font-bold animate-bounce">خطأ! تذكري أنكِ "Noor" عيوني</p>
+        </div>
+    </div>
+
+    <!-- شاشة الزر (المفاجأة) -->
+    <div id="trigger-screen" class="hidden-element fixed inset-0 z-30 flex-col items-center justify-center bg-white/80">
+        <h1 class="text-4xl font-bold text-pink-600 mb-8 animate-bounce">يا نور عيني...</h1>
+        <button onclick="startExplosion()" class="pulse-button bg-gradient-to-r from-pink-400 to-purple-500 text-white text-2xl md:text-3xl font-bold py-6 px-12 rounded-full shadow-2xl transform transition hover:scale-110">
+            اضغطي هنا يا بابا 💖
+        </button>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div id="main-content" class="hidden-element flex-col min-h-screen relative z-10 pt-10 pb-20 px-4">
+        
+        <!-- العنوان -->
+        <header class="text-center mb-10">
+            <h1 class="text-5xl md:text-7xl font-amiri text-pink-600 mb-2 drop-shadow-md">نور قيس</h1>
+            <p class="text-xl text-gray-500 font-light">أنتِ الضحكة وأنتِ الحياة</p>
+        </header>
+
+        <!-- العداد -->
+        <div class="container mx-auto mb-16">
+            <div class="glass-card rounded-3xl p-6 md:p-10 shadow-xl border-t-4 border-pink-400">
+                <h3 class="text-center text-3xl font-bold text-pink-600 mb-8 font-amiri">عداد الحب</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div class="bg-pink-100 p-4 rounded-2xl">
+                        <span id="days" class="block text-4xl md:text-5xl font-bold text-pink-600">0</span>
+                        <span class="text-gray-600 font-medium">يوم</span>
+                    </div>
+                    <div class="bg-pink-100 p-4 rounded-2xl">
+                        <span id="hours" class="block text-4xl md:text-5xl font-bold text-pink-600">0</span>
+                        <span class="text-gray-600 font-medium">ساعة</span>
+                    </div>
+                    <div class="bg-pink-100 p-4 rounded-2xl">
+                        <span id="minutes" class="block text-4xl md:text-5xl font-bold text-pink-600">0</span>
+                        <span class="text-gray-600 font-medium">دقيقة</span>
+                    </div>
+                    <div class="bg-pink-100 p-4 rounded-2xl">
+                        <span id="seconds" class="block text-4xl md:text-5xl font-bold text-pink-600">0</span>
+                        <span class="text-gray-600 font-medium">ثانية</span>
+                    </div>
+                </div>
+                <p class="text-center mt-6 text-pink-400 text-sm md:text-base font-bold">بدأنا العد من تاريخ 12/2</p>
+            </div>
+        </div>
+
+        <!-- قسم الرسائل المتجدد -->
+        <div class="container mx-auto max-w-3xl">
+            <div class="relative glass-card p-8 md:p-12 rounded-3xl shadow-lg text-center min-h-[300px] flex flex-col justify-center items-center transform hover:rotate-1 transition duration-300">
+                <div class="text-6xl text-pink-200 absolute top-4 right-6">"</div>
+                <p id="poem-text" class="text-2xl md:text-4xl font-amiri leading-relaxed text-gray-800 transition-opacity duration-1000 opacity-100">
+                    جاري تحميل رسائل بابا...
+                </p>
+                <div class="text-6xl text-pink-200 absolute bottom-4 left-6">"</div>
+                
+                <div class="mt-8 flex gap-2 justify-center">
+                    <span class="w-2 h-2 rounded-full bg-pink-500 animate-bounce"></span>
+                    <span class="w-2 h-2 rounded-full bg-pink-500 animate-bounce" style="animation-delay: 0.2s"></span>
+                    <span class="w-2 h-2 rounded-full bg-pink-500 animate-bounce" style="animation-delay: 0.4s"></span>
+                </div>
+            </div>
+            <button onclick="nextPoem()" class="mt-6 mx-auto block bg-white border-2 border-pink-300 text-pink-500 px-8 py-3 rounded-full hover:bg-pink-500 hover:text-white transition font-bold shadow-md">
+                رسالة أخرى من بابا ❤️
+            </button>
+        </div>
+
+        <!-- التوقيع -->
+        <footer class="mt-20 text-center text-gray-500">
+            <p>هدية بسيطة من والدك المحب</p>
+            <p class="text-2xl font-bold text-pink-600 font-amiri mt-2">قيس جازي</p>
+            <div class="mt-4 flex justify-center gap-2 text-2xl">
+                <span>👨‍👧</span><span>💖</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // === 1. منطق كلمة المرور ===
+        function checkPassword() {
+            const input = document.getElementById('password-input').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+            const loginScreen = document.getElementById('login-screen');
+            const triggerScreen = document.getElementById('trigger-screen');
+
+            // التحقق من الباسورد (Noor) غير حساس لحالة الأحرف
+            if (input.toLowerCase() === 'noor') {
+                loginScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loginScreen.style.display = 'none';
+                    triggerScreen.style.display = 'flex';
+                    setTimeout(() => triggerScreen.style.opacity = '1', 100);
+                }, 700);
+            } else {
+                errorMsg.classList.remove('hidden');
+                document.getElementById('password-input').value = '';
+            }
+        }
+
+        // === 2. منطق الانفجار (Confetti) - ألوان زهرية وبنفسجية ===
+        const canvas = document.getElementById("confetti-canvas");
+        const ctx = canvas.getContext("2d");
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createParticle(x, y) {
+            // ألوان طفولية مرحة (زهري، بنفسجي، أصفر، أبيض)
+            const colors = ['#FF69B4', '#FFB6C1', '#DDA0DD', '#EE82EE', '#FFD700', '#FFFFFF'];
+            const particle = {
+                x: x,
+                y: y,
+                size: Math.random() * 12 + 6,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speedX: Math.random() * 12 - 6,
+                speedY: Math.random() * 12 - 6,
+                gravity: 0.15,
+                life: 150
+            };
+            particles.push(particle);
+        }
+
+        function updateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.speedX;
+                p.y += p.speedY;
+                p.speedY += p.gravity;
+                p.life -= 1;
+                p.size *= 0.98;
+
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            if (particles.length > 0) requestAnimationFrame(updateParticles);
+        }
+
+        function startExplosion() {
+            const triggerScreen = document.getElementById('trigger-screen');
+            const mainContent = document.getElementById('main-content');
+            
+            triggerScreen.style.transition = "opacity 0.5s";
+            triggerScreen.style.opacity = "0";
+            
+            for (let i = 0; i < 350; i++) {
+                createParticle(window.innerWidth / 2, window.innerHeight / 2);
+            }
+            updateParticles();
+
+            setTimeout(() => {
+                triggerScreen.style.display = 'none';
+                mainContent.style.display = 'flex';
+                setTimeout(() => mainContent.style.opacity = '1', 100);
+                startTimer();
+                nextPoem();
+                startAutoPoem();
+            }, 1000);
+        }
+
+        // === 3. منطق العداد (12/2) ===
+        function startTimer() {
+            // تم ضبط التاريخ على 12 شباط (فبراير) من السنة الحالية أو القادمة
+            // سأضعه لليوم 12/2/2026 حسب طلبك (تاريخ اليوم)
+            const startDate = new Date("February 12, 2026 00:00:00").getTime();
+
+            setInterval(function() {
+                const now = new Date().getTime();
+                // نستخدم Math.abs للتعامل مع العداد سواء كان التاريخ في الماضي أو المستقبل القريب جداً
+                // لكن بما أنه "عداد حب" فالمفروض يحسب المدة المنقضية
+                let distance = now - startDate;
+                
+                // إذا كان التاريخ في المستقبل، نعكس الحسبة لنظهر كم تبقى (اختياري، لكن هنا سنفترض أنه بدأ)
+                // إذا أردت أن يبدأ من لحظة الضغط، يمكن تغيير الكود. حالياً يبدأ من بداية يوم 12/2.
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // ضمان عدم ظهور أرقام سالبة إذا كان الوقت مبكراً جداً
+                document.getElementById("days").innerText = Math.max(0, days);
+                document.getElementById("hours").innerText = Math.max(0, hours);
+                document.getElementById("minutes").innerText = Math.max(0, minutes);
+                document.getElementById("seconds").innerText = Math.max(0, seconds);
+            }, 1000);
+        }
+
+        // === 4. رسائل الأب لابنته ===
+        const poems = [
+            "يا نور.. اسمك ليس مجرد اسم، بل هو وصفي لكي في حياتي.",
+            "أنتِ النسخة المصغرة من كل شيء جميل في هذا العالم.",
+            "يا ابنتي الغالية، أنتِ أول حب في حياة أبيكِ وآخر حب.",
+            "نور.. ضحكتكِ هي الموسيقى الوحيدة التي يطرب لها قلبي.",
+            "اللهم احفظ لي نور، فهي قطعة من روحي تمشي على الأرض.",
+            "بنت قيس.. لقبكِ هو وسام شرف أضعه على صدري.",
+            "كل البنات جميلات، لكنكِ يا نور شيء آخر يفوق الوصف.",
+            "أنتِ يا نور زينة البيت، وبهجة الأيام، وسر السعادة.",
+            "عندما أنظر إليكِ يا ابنتي، أرى مستقبلاً مشرقاً كاسمك.",
+            "يا أميرتي الصغيرة، كوني قوية، كوني سعيدة، كوني أنتِ.",
+            "حب الأب لابنته لا يُكتب، بل يُشعر به في كل نبضة.",
+            "يا نور.. أنتِ الهدية التي جاءت من السماء لتنير عتمة أيامي.",
+            "مهما كبرتِ، ستظلين طفلتي المدللة وصغيرتي المحبوبة.",
+            "في عينيكِ يا نور، أرى براءة العالم وتفاصيل الفرح.",
+            "أحبكِ يا بابا فوق الحب حباً، وفوق العمر عمراً.",
+            "أنتِ سكر الأيام، وملح الحياة، ووردة البستان.",
+            "يا نور.. ابتسامتكِ في الصباح تعادل كنوز الدنيا.",
+            "ابنتي الغالية.. تذكري دائماً أن ظهر أبيكِ هو سندكِ الدائم.",
+            "يا جميلتي، لا يليق بعينيكِ إلا الفرح.",
+            "نور قيس.. اسم يحمل كل معاني الفخر والعز.",
+            "أنتِ لستِ فقط ابنتي، أنتِ صديقتي وحبيبتي وكل دنيتي.",
+            "حماكِ الله يا نور من كل سوء، وجعل أيامك كلها سعادة.",
+            "يا زهرة شبابي، وفرحة شيبي، ونور دربي.",
+            "وجودك يا نور هو الإثبات الأكبر أن الحياة جميلة.",
+            "كل عام وكل يوم وأنتِ نور يضيء حياتنا.",
+            "أنتِ الحكاية الحلوة التي أرويها للزمن بفخر.",
+            "يا قطعة السكر في فنجان حياتي المرة.",
+            "أحبكِ يا نور، كلمة صغيرة لكنها تحمل مشاعر بحجم الكون.",
+            "أنتِ الدفء في الشتاء، والنسيم في الصيف.",
+            "يا رب اجعل لاسمها نصيباً من حياتها، وأنر دربها يا الله."
+        ];
+
+        function nextPoem() {
+            const poemElement = document.getElementById('poem-text');
+            poemElement.style.opacity = 0; 
+            
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * poems.length);
+                poemElement.innerText = poems[randomIndex];
+                poemElement.style.opacity = 1; 
+            }, 500);
+        }
+
+        function startAutoPoem() {
+            setInterval(nextPoem, 8000); 
+        }
+
+        document.getElementById("password-input").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                checkPassword();
+            }
+        });
+
+    </script>
+</body>
+</html>
+
